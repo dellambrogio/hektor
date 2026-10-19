@@ -23,6 +23,7 @@ dev/                developer tools: monitor, dev console, mic and wake word tes
 ubuntu/             turning hektor into Hektor: setup.sh, deploy.sh, claude-token.sh — see ubuntu/README.md
 worker/             monitor doing the speech to text for hektor, faster — see worker/README.md
 plan.md             what is still to do, open questions
+LICENSE             MIT
 .vscode/            launch configs: window, full screen, eyes only, dev console, monitor
 .claude/skills/     hektor: how Claude Code deploys to and looks after hektor
 ```
@@ -101,3 +102,7 @@ Look at the stripe at the bottom of the screen while you talk, or at the monitor
 
 The noise levels and thresholds of each recording are in the log ("listening ... noise, speech threshold",
 "recorded ... loudest ... quiet under").
+
+## License
+
+MIT, see [LICENSE](LICENSE).
