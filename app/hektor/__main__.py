@@ -22,6 +22,8 @@ import logging
 import logging.handlers
 import os
 import random
+import subprocess
+import threading
 import time
 
 os.environ.setdefault("SDL_VIDEODRIVER", "wayland,x11")
@@ -35,6 +37,9 @@ from .sounds import IDLE, Sounds  # noqa: E402
 from .stripe import Stripe  # noqa: E402
 
 log = logging.getLogger("hektor")
+# the monitor app's Shut down button creates it; the app (in the logged-in desktop session, so no sudo
+# needed) falls asleep and powers the machine off
+POWER_OFF = config.LOG.parent / "power-off"
 
 STATE_KEYS = {pygame.K_1: "idle", pygame.K_2: "sleeping", pygame.K_3: "listening",
               pygame.K_4: "thinking", pygame.K_5: "speaking"}
@@ -207,6 +212,9 @@ class App:
         if now < self.next_conf_check:
             return
         self.next_conf_check = now + 1
+        if POWER_OFF.exists():
+            POWER_OFF.unlink(missing_ok=True)
+            self.power_off()
         if history.CLEAR_REQUEST.exists():  # the monitor app's Delete
             log.info("deleting the conversation (asked by the monitor app)")
             if self.voice:
@@ -244,6 +252,22 @@ class App:
                 self.voice.brain.conf["MODEL"] = model  # from the next question on, same conversation
             events.emit("model", name=model)
         self.model = model
+
+    def power_off(self) -> None:
+        """Yawn, close the eyes, and switch the machine off (asked by the monitor app)."""
+        log.info("powering off (asked by the monitor app)")
+        events.emit("shutdown")
+        if self.voice:
+            self.voice.reset()
+        self.eyes.set_state("sleeping")
+
+        def run() -> None:
+            time.sleep(3)  # the yawn, the eyes closing
+            done = subprocess.run(["systemctl", "poweroff"], capture_output=True, text=True)
+            if done.returncode:  # something holds it off (an inhibitor), or no permission
+                log.error("can't power off: %s", done.stderr.strip())
+                events.emit("error", text=f"can't power off: {done.stderr.strip()}")
+        threading.Thread(target=run, name="power-off", daemon=True).start()
 
     def event(self, ev) -> None:
         eyes, voice, sounds = self.eyes, self.voice, self.sounds

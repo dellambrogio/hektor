@@ -190,6 +190,19 @@ class Feed:
         if self.proc:
             self.proc.terminate()
 
+    def power_off(self) -> None:
+        """Ask the app there to switch the machine off: it runs `systemctl poweroff` from the desktop
+        session it's logged into, which needs no sudo (over SSH it would ask for a password)."""
+        script = "mkdir -p ~/.local/state/hektor && touch ~/.local/state/hektor/power-off"
+        cmd = ["bash", "-c", script] if self.host == "local" else [
+            "ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=5", self.host, script]
+
+        def run() -> None:
+            done = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, text=True)
+            if done.returncode:
+                log.error("couldn't ask to power off: %s", done.stderr.strip())
+        threading.Thread(target=run, name="power-off", daemon=True).start()
+
     def clear_conversation(self) -> None:
         """Ask the app there to delete the conversation (history.py): it does within a second."""
         script = "mkdir -p ~/.local/state/hektor && touch ~/.local/state/hektor/clear-conversation"
@@ -308,6 +321,8 @@ def transcript(events: list[dict]) -> list[tuple[str, float, str, str]]:
                 rows.append(("rule", t, "", "Hektor started"))
             case "stop":
                 rows.append(("rule", t, "", "Hektor stopped"))
+            case "shutdown":
+                rows.append(("rule", t, "", "hektor shutting down"))
             case "reset":
                 rows.append(("rule", t, "", "new conversation"))
             case "wake":
@@ -383,6 +398,7 @@ class Monitor:
         self.wanted: dict[str, tuple[bool, float]] = {}  # setting: (on, until when) after its button
         self.confirm: tuple[str, float] | None = None  # (name, until when): the trash can asks "delete?"
         self.menu_open = False             # the model menu
+        self.powering_off = 0.0            # when Shut down was confirmed
         self.model_wanted: tuple[str, float] | None = None  # (model, until when) after picking one
         self.editing: dict | None = None    # renaming someone: {"old": name, "text": what's typed}
         self.face_busy: dict[str, str] = {}  # name: "deleting…" / "renaming…" while it's done there
@@ -525,6 +541,12 @@ class Monitor:
             self.menu_open = False
             self.model_wanted = (name[6:], time.monotonic() + 20)
             self.feed.set_setting("MODEL", name[6:])
+        elif name == "power":
+            if self.confirm and self.confirm[0] == "\0power" and time.monotonic() < self.confirm[1]:
+                self.confirm, self.powering_off = None, time.monotonic()
+                self.feed.power_off()
+            else:
+                self.confirm = ("\0power", time.monotonic() + 4)
         elif name == "delete":
             if self.confirm and self.confirm[0] == "\0conversation" and time.monotonic() < self.confirm[1]:
                 self.confirm = None
@@ -673,6 +695,14 @@ class Monitor:
 
     def draw_status(self, w: int, service: dict, connected: bool, error: str, st: dict) -> None:
         pygame.draw.rect(self.screen, PANEL, (8, 8, w - 16, 50), border_radius=8)
+        # switching hektor off, on the right: twice to confirm, then what happens
+        sure = self.confirm and self.confirm[0] == "\0power" and time.monotonic() < self.confirm[1]
+        if self.powering_off and time.monotonic() - self.powering_off < 120:
+            power_x = self.button("power", "hektor is shutting down…" if connected else "hektor is off", LINE, False,
+                                  w - 20, 20, 26)
+        else:
+            power_x = self.button("power", "shut down hektor?" if sure else "Shut down", WARN, connected, w - 20, 20, 26)
+        self.screen.set_clip(pygame.Rect(8, 8, power_x - 20, 50))
         x = self.label("Hektor", (20, 20), self.title, COLOR) + 14
         x = self.label(self.host, (x, 24), self.small, DIM) + 16
         if not connected:
@@ -689,7 +719,7 @@ class Monitor:
                 x = self.label(f"since {m.group(1)} {m.group(2)}", (x, 24), self.small, DIM)
         # what it's doing now, its mood, how long the last turn took
         state = st["state"] if active == "active" else "off"
-        self.screen.set_clip(pygame.Rect(8, 8, w - 16, 50))
+        self.screen.set_clip(pygame.Rect(8, 8, power_x - 20, 50))
         x = max(x + 28, 420)
         x = self.label(state, (x, 17), self.title, STATES.get(state, TEXT)) + 28
         x = self.label("mood", (x, 24), self.small, DIM) + 8

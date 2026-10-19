@@ -4,7 +4,7 @@
 mood, model (Claude's), face, camera (on or off), recognition (on or off), person (who the face is), looked (someone
 known looked at it: it listens), enrolled, forgot,
 wake, ignored (a wake word without a voice), listening, nothing, heard, unclear, reply, interrupted,
-cancelled, reset, error, cleared (the conversation was deleted, history.py).
+cancelled, reset, error, cleared (the conversation was deleted, history.py), shutdown (powering off).
 """
 import json
 import threading

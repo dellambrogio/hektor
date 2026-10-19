@@ -24,7 +24,7 @@ A window that watches Hektor on hektor over SSH (HOST: `user@machine`, default `
 
 | Panel        | Shows                                                                          |
 |--------------|--------------------------------------------------------------------------------|
-| top bar      | Hektor's service running or not, since when; what it's doing now (idle, listening, ...), its mood, how long whisper and Claude took and how soon it talked |
+| top bar      | Hektor's service running or not, since when; what it's doing now (idle, listening, ...), its mood, how long whisper and Claude took and how soon it talked; **Shut down** (click twice) switches hektor off: the app does it from its desktop session, no sudo needed; the power button turns it on again |
 | screen       | what hektor's screen shows (the eyes), ~3 times a second                       |
 | camera       | what the camera sees, the faces boxed; a button turns Hektor's camera on and off (`CAMERA` in hektor's `~/.config/hektor/hektor.conf`, applied while it runs); `c` shows / hides the picture here |
 | faces        | who it sees now (the name, someone, nobody); a button turns face detection (recognition: who it is, `FACE_RECOGNITION`) on and off; who it knows, from hektor's `faces.json` (only the names and how many fingerprints come over), each with a pencil to rename them (type, Enter saves, Esc cancels) and a trash can to delete them (click twice: the second click confirms) |

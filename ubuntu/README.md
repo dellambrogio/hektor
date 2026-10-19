@@ -68,6 +68,7 @@ busy while it transcribes, monitor's CPU and RAM, and the worker's log.
 
 | What                     | Where / how                                             |
 |--------------------------|---------------------------------------------------------|
+| switch hektor off        | the monitor app's **Shut down** (twice); the power button turns it on again |
 | quit Hektor              | `Ctrl+Q`: back to the desktop; `systemctl --user start hektor` brings it back |
 | restart / stop Hektor    | `systemctl --user restart hektor` / `systemctl --user stop hektor` |
 | settings for this laptop | `~/.config/hektor/hektor.conf` (deploys don't touch it) |
