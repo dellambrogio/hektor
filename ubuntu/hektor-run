@@ -1,0 +1,11 @@
+#!/bin/bash
+# What hektor.service runs: Hektor full screen in the GNOME session, with the Claude token.
+# Ctrl+Q quits to the desktop; a crash restarts it (the service).
+export PATH="$HOME/.local/bin:$PATH"
+if [[ -f ~/.config/hektor/env ]]; then
+    set -a
+    source ~/.config/hektor/env
+    set +a
+fi
+cd ~/hektor/app || exit 1
+exec ./run.sh --kiosk

@@ -1,0 +1,7 @@
+# Which machine is Hektor: copy to deploy.conf (not committed) and fill in. Read by ubuntu/deploy.sh,
+# ubuntu/claude-token.sh and dev/run.sh monitor; HEKTOR_HOST / HEKTOR_ADMIN in the environment win.
+
+# user@machine that runs Hektor (no sudo)
+HEKTOR_HOST=hektor@robot-laptop
+# admin account on the same machine, for deploy.sh --setup
+HEKTOR_ADMIN=admin

@@ -1,0 +1,11 @@
+# whisper-server for Hektor on hektor (worker/setup.sh installs it). Logs: journalctl --user -u hektor-whisper
+[Unit]
+Description=Hektor worker: whisper-server
+
+[Service]
+ExecStart=@REPO@/worker/whisper.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

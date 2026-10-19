@@ -1,0 +1,14 @@
+# Hektor, full screen in the GNOME session: started at login, started again when it crashes,
+# not when it's quit with Ctrl+Q. Logs: journalctl --user -u hektor
+[Unit]
+Description=Hektor, full screen
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/hektor/ubuntu/hektor-run
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target

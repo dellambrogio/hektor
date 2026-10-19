@@ -1,0 +1,14 @@
+# The SSH tunnel that lets Hektor on hektor reach whisper-server here (worker/setup.sh installs it).
+# Logs: journalctl --user -u hektor-tunnel
+[Unit]
+Description=Hektor worker: tunnel to hektor
+Wants=hektor-whisper.service
+After=hektor-whisper.service network-online.target
+
+[Service]
+ExecStart=@REPO@/worker/tunnel.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

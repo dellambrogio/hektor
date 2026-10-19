@@ -1,0 +1,74 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Hektor (window)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "hektor",
+            "args": [
+                "--window"
+            ],
+            "cwd": "${workspaceFolder}/app",
+            "python": "${workspaceFolder}/app/.venv/bin/python",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Hektor (full screen)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "hektor",
+            "cwd": "${workspaceFolder}/app",
+            "python": "${workspaceFolder}/app/.venv/bin/python",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Hektor (eyes only)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "hektor",
+            "args": [
+                "--window",
+                "--no-voice"
+            ],
+            "cwd": "${workspaceFolder}/app",
+            "python": "${workspaceFolder}/app/.venv/bin/python",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Hektor (dev console)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "dev",
+            "args": [
+                "console"
+            ],
+            "cwd": "${workspaceFolder}",
+            "python": "${workspaceFolder}/app/.venv/bin/python",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/app"
+            }
+        },
+        {
+            "name": "Hektor (monitor app)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "dev",
+            "args": [
+                "monitor"
+            ],
+            "cwd": "${workspaceFolder}",
+            "python": "${workspaceFolder}/app/.venv/bin/python",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/app"
+            }
+        }
+    ]
+}
